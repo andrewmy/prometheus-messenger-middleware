@@ -10,7 +10,7 @@ on:
 
 jobs:
   unit-tests:
-    name: PHP ${{ matrix.php }} tests on symfony ${{ matrix.symfony_version }}, deps=${{ matrix.dependencies }}
+    name: PHP ${{ matrix.php-versions }} tests on symfony ${{ matrix.symfony_version }}, deps=${{ matrix.dependencies }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
