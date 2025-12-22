@@ -1,4 +1,4 @@
-name: CodeStyle
+name: CI
 
 on:
   pull_request:
@@ -10,54 +10,60 @@ on:
 
 jobs:
   unit-tests:
-    runs-on: ${{ matrix.operating-system }}
+    name: PHP ${{ matrix.php }} tests on symfony ${{ matrix.symfony_version }}, deps=${{ matrix.dependencies }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        operating-system: [ubuntu-latest, macos-latest]
-        php-versions: ['7.3', '7.4', '8.0']
+        php-versions: ['8.2', '8.3', '8.4', '8.5']
+        symfony_version: ['6.4.*', '7.3.*', '7.4.*', '8.0.*']
+        dependencies: ['lowest', 'highest']
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          tools: phpunit, composer
-      - name: Install Dependencies
-        run: composer install --no-ansi --no-interaction --no-suggest --no-progress --prefer-dist
+          tools: phpunit
+
+      - run: php ./tests/bin/pin-symfony-version.php "${{ matrix.symfony_version }}"
+
+      - uses: "ramsey/composer-install@v3"
+        with:
+          dependency-versions: "${{ matrix.dependencies }}"
+
       - name: PHPUnit
         run: phpunit
+
   phpcs:
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      matrix:
-        operating-system: [ubuntu-latest, macos-latest]
-        php-versions: ['7.4', '8.0', '8.1', '8.2']
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
-          tools: cs2pr, phpcs, composer
-      - name: Install Dependencies
-        run: composer install --no-ansi --no-interaction --no-suggest --no-progress --prefer-dist
+          php-version: '8.2'
+          tools: cs2pr, phpcs
+
+      - uses: "ramsey/composer-install@v3"
+
       - name: PHPCS
         run: phpcs -p
+
   phpstan:
-    runs-on: ${{ matrix.operating-system }}
-    strategy:
-      matrix:
-        operating-system: [ubuntu-latest, macos-latest]
-        php-versions: ['7.2', '7.3', '7.4']
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
-          tools: cs2pr, phpstan, composer
-      - name: Install Dependencies
-        run: composer install --no-ansi --no-interaction --no-suggest --no-progress --prefer-dist
+          php-version: '8.2'
+          tools: cs2pr, phpstan
+
+      - uses: "ramsey/composer-install@v3"
+
       - name: PHPStan
         run: phpstan analyse src --error-format=checkstyle | cs2pr
-
