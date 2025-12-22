@@ -10,12 +10,12 @@ on:
 
 jobs:
   unit-tests:
-    name: PHP ${{ matrix.php-versions }} tests on symfony ${{ matrix.symfony_version }}, deps=${{ matrix.dependencies }}
+    name: PHP ${{ matrix.php-version }} tests on symfony ${{ matrix.symfony-version }}, deps=${{ matrix.dependencies }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ['8.2', '8.3', '8.4', '8.5']
-        symfony_version: ['6.4.*', '7.3.*', '7.4.*', '8.0.*']
+        php-version: ['8.2', '8.3', '8.4', '8.5']
+        symfony-version: ['6.4.*', '7.3.*', '7.4.*', '8.0.*']
         dependencies: ['lowest', 'highest']
 
     steps:
@@ -24,10 +24,10 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.php-version }}
           tools: phpunit
 
-      - run: php ./tests/bin/pin-symfony-version.php "${{ matrix.symfony_version }}"
+      - run: php ./tests/bin/pin-symfony-version.php "${{ matrix.symfony-version }}"
 
       - uses: "ramsey/composer-install@v3"
         with:

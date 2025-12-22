@@ -6,8 +6,6 @@ parameters:
         -
             identifier: missingType.iterableValue
         -
-        	identifier: missingType.generics
-        -
             # remove when promphp/prometheus_client_php/src/Prometheus/Collector.php gets a @throws annotation
             message: '#Dead catch - InvalidArgumentException is never thrown in the try block#'
             path: src/PrometheusMiddleware.php
